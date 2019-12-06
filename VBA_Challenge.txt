@@ -1,0 +1,151 @@
+Option Explicit
+
+Sub stock_Analysis()
+
+'loop through worksheet
+Dim ws As Worksheet
+For Each ws In ThisWorkbook.Worksheets
+    ws.Activate
+    
+  
+    'Determine variables
+    Dim ticker As String
+    Dim vol As Double
+    Dim Summary_Table_Row As Long
+    Dim year_open As Double
+    Dim year_close As Double
+    Dim i, j As Long
+    Dim yearly_change As Double
+    Dim percent_Change As Double
+    Dim last_row As Long
+    
+    
+    Dim greatest_percent_Increase As Double
+    Dim greatest_percent_decrease As Double
+    Dim greatest_percent_increase_ticker As String
+    Dim greatest_percent_decrease_ticker As String
+    Dim greatest_totalvol As Double
+    Dim greatest_totalvol_ticker As String
+    Dim total_vol As Double
+    
+    
+
+    Cells(1, 9).Value = "ticker"
+    Cells(1, 10).Value = "Yearly_change"
+    Cells(1, 12).Value = "Total Stock Vol"
+    Cells(1, 11).Value = "percent_change"
+    Cells(1, 16).Value = "Ticker"
+    Cells(1, 17).Value = "Value"
+    Cells(2, 15).Value = "Greatest % Increase"
+    Cells(3, 15).Value = "Greatest % Decrease"
+    Cells(4, 15).Value = "Greatest Total Volume"
+
+    Summary_Table_Row = 2
+    last_row = ActiveSheet.UsedRange.Rows.Count
+    
+    For i = 2 To last_row
+
+      If year_open = 0 Then
+
+          year_open = Cells(i, 3).Value
+      End If
+
+      If Cells(i - 1, 1) = Cells(i, 1) And Cells(i + 1, 1).Value <> Cells(i, 1).Value Then
+          year_close = Cells(i, 6).Value
+          yearly_change = year_close - year_open
+          percent_Change = yearly_change / year_close
+          
+          
+        If greatest_percent_Increase < percent_Change Then
+            greatest_percent_Increase = percent_Change
+            greatest_percent_increase_ticker = ticker
+        End If
+          
+        If greatest_percent_decrease > percent_Change Then
+            greatest_percent_decrease = percent_Change
+            greatest_percent_decrease_ticker = ticker
+        End If
+        
+        If greatest_totalvol < total_vol Then
+           greatest_totalvol = total_vol
+           greatest_totalvol_ticker = ticker
+        End If
+    
+        If ticker <> Cells(2, 1).Value Then
+            ticker = Cells(2, 1).Value
+'            year_open = Cells(2, 3).Value
+            total_vol = Cells(2, 7).Value + vol
+            
+        End If
+        
+          
+          
+          Cells(2, 16).Value = greatest_percent_increase_ticker
+          Cells(2, 17).Value = greatest_percent_Increase
+          Cells(3, 16).Value = greatest_percent_decrease_ticker
+          Cells(3, 17).Value = greatest_percent_decrease
+          Cells(4, 16).Value = greatest_totalvol_ticker
+          Cells(4, 17).Value = greatest_totalvol
+          
+          
+          
+          
+
+          ticker = Cells(i, 1).Value
+          vol = 0
+
+          vol = vol + Cells(i, 7).Value
+
+
+
+          Range("j" & Summary_Table_Row).Value = yearly_change
+
+
+          Range("I" & Summary_Table_Row).Value = ticker
+
+          Range("K" & Summary_Table_Row).Value = percent_Change
+
+
+
+          Range("L" & Summary_Table_Row).Value = vol
+
+          Summary_Table_Row = Summary_Table_Row + 1
+
+          vol = 0
+
+
+      Else
+
+          vol = vol + Cells(i, 7).Value
+
+
+      End If
+
+
+    Next i
+    
+    'Color formatting
+        Summary_Table_Row = j
+        For j = 2 To last_row
+
+            If Cells(j, 10).Value > 0 Then
+                Cells(j, 10).Interior.ColorIndex = 4
+            ElseIf Cells(j, 10).Value < 0 Then
+                Cells(j, 10).Interior.ColorIndex = 3
+            End If
+
+        Next j
+    
+    Range("K1").EntireColumn.NumberFormat = "0.00%"
+   
+    
+    
+
+    
+Next ws
+
+End Sub
+
+
+
+
